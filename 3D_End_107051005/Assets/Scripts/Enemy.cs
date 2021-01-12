@@ -14,11 +14,12 @@ public class Enemy : MonoBehaviour
     public float stopDistance = 2.5f;
     [Header("攻擊冷卻時間"), Range(0, 50)]
     public float cd = 2f;
-
-    [Header("攻擊中心點")]
+   [Header("攻擊中心點")]
     public Transform atkPoint;
     [Header("攻擊長度"), Range(0f, 5f)]
     public float atkLength;
+    [Header("攻擊力"), Range(0, 500)]
+    public float atk=30;
 
     private void Awake()
     {
@@ -75,10 +76,34 @@ public class Enemy : MonoBehaviour
                 if (Physics.Raycast(atkPoint.position, atkPoint.forward, out hit, atkLength, 1 << 8))
                 {
                     //碰撞物件.取得元件<玩家>(),受傷()
-                    hit.collider.GetComponent<Player>().Damage();
+                    hit.collider.GetComponent<Player>().Damage(atk);
                 }
             }
         }
+    }
+
+    private float hp = 60;
+
+    /// <summary>
+    /// 受傷
+    /// </summary>
+    /// damage為接收傷害值
+    public void Damage(float damage)
+    {
+        hp -= damage;
+        ani.SetTrigger("受傷觸發");
+
+        if (hp <= 0) Dead();
+    }
+    /// <summary>
+    /// 死亡觸發
+    /// </summary>
+    private void Dead()
+    {
+        nav.isStopped = true;//關閉導覽器
+            enabled = false;//關閉腳本
+        ani.SetBool("死亡開關",true);//死亡動畫
+
     }
     //追蹤
     private void Track()
